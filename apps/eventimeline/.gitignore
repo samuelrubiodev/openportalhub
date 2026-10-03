@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Espejos de skills instalados por herramientas (regenerables; se rastrea skills-lock.json)
+.agent/
+.agents/
+.claude/
+.codex/
+.gemini/
+.grok/
+.hermes/
+.opencode/
+.pi/
+
+# Logs / env / editor
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+# Local Pi runtime state
+.atl/
+
+# ODD work tracking stays local (task files and playbooks are not published)
+odd/

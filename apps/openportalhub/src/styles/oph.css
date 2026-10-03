@@ -1,0 +1,390 @@
+/* OpenPortalHub sections — same seismograph-station world as hero.css.
+   Catalog table, featured project, notes, studio, close. */
+
+/* ---------- catalog table ---------- */
+
+/* Seven columns need ~565px; below that the wrapper scrolls instead of
+   pushing the whole page sideways. */
+.cat-scroll {
+  overflow-x: auto;
+  margin: 0 0 24px;
+}
+
+.cat-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.cat-table th {
+  font-family: var(--font-mono);
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-grey-dim);
+  text-align: left;
+  padding: 10px 16px 10px 0;
+  border-bottom: 1px solid var(--ink-hairline);
+}
+
+.cat-table td {
+  padding: 18px 16px 18px 0;
+  border-bottom: 1px solid var(--ink-hairline);
+  font-size: 15px;
+  color: var(--ink-white);
+  vertical-align: baseline;
+}
+
+.cat-table td a {
+  color: var(--ink-white);
+  text-decoration: none;
+  border-bottom: 1px solid var(--pencil-red);
+}
+
+.cat-table td a:hover,
+.cat-table td a:focus-visible {
+  color: var(--pencil-red);
+}
+
+.cat-table .mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.cat-table .dim { color: var(--ink-grey-dim); }
+
+.cat-badge {
+  display: inline-block;
+  margin-left: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pencil-red);
+  border: 1px solid rgba(210, 59, 46, 0.45);
+  padding: 2px 7px;
+}
+
+/* ---------- hero featured card (hub) ---------- */
+
+.feat-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--ink-hairline);
+  background: var(--ground-raised);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: border-color 120ms ease-out, transform 120ms ease-out;
+}
+
+/* The card hugs the measured window: the scale already encodes both the
+   column width and the room left in the hero, so deriving the width from it
+   keeps the intended ratio with a measurement instead of a constant. Without
+   JavaScript the fallback keeps the card at column width. */
+.feat-card {
+  width: min(100%, calc(1377px * var(--et-fit-scale, 1)));
+  margin-inline: auto;
+}
+
+.feat-card:hover,
+.feat-card:focus-visible {
+  border-color: rgba(210, 59, 46, 0.45);
+  transform: translateY(-2px);
+}
+
+.feat-card__shot {
+  border-bottom: 1px solid var(--ink-hairline);
+  background: var(--ground);
+}
+
+/* Phones: the applied scale is clamped to at least 0.523 — 720 / 1377, the scale
+   that keeps the window's text near 7px, i.e. the legible left-half crop this
+   block has always shown (title bar, time corridor, context panel, first lanes).
+   This is the only place the clamp exists: the media query is what scopes the
+   crop to phones, so above it the poster always fits the measured room. */
+@media (max-width: 560px) {
+  .feat-card__shot {
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+  }
+
+  .feat-card__shot .et-poster {
+    --et-scale: max(var(--et-fit-scale, 0), 0.523);
+  }
+}
+
+.feat-card__body {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feat-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-white);
+}
+
+.feat-card__title .mono {
+  font-family: var(--font-mono);
+  font-weight: 300;
+  font-size: 13px;
+  color: var(--ink-grey);
+}
+
+.feat-card__desc {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-grey);
+}
+
+.feat-card__link {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--pencil-red);
+}
+
+.feat-card:hover .feat-card__link,
+.feat-card:focus-visible .feat-card__link {
+  color: var(--error-red);
+}
+/* ---------- featured project ---------- */
+
+
+.ft-mock {
+  margin: 40px 0;
+}
+
+.ft-actions {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin: 40px 0;
+  flex-wrap: wrap;
+}
+
+.ft-link {
+  font-family: var(--font-button);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--ink-white);
+  text-decoration: none;
+  border-bottom: 1px solid var(--pencil-red);
+  padding-bottom: 2px;
+}
+
+.ft-link:hover,
+.ft-link:focus-visible {
+  color: var(--pencil-red);
+}
+
+.ft-btn {
+  display: inline-block;
+  text-decoration: none;
+  width: auto;
+  padding: 0 24px;
+  height: 48px;
+  line-height: 48px;
+  font-size: 14px;
+}
+
+.ft-steps {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  display: grid;
+  gap: 32px;
+  list-style: none;
+  margin: 48px 0 0;
+  padding: 0;
+}
+
+.ft-steps p {
+  margin: 0;
+  color: var(--ink-grey);
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+/* ---------- notes rows ---------- */
+
+.notes .src-list li {
+  display: grid;
+  grid-template-columns: 260px 1fr auto;
+  gap: 24px;
+  align-items: baseline;
+}
+
+@media (max-width: 700px) {
+  .notes .src-list li {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+/* ---------- product page (event-timeline) ---------- */
+
+.crumbs {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-grey-dim);
+  margin: 0 0 28px;
+}
+
+.crumbs a { color: var(--ink-grey); text-decoration: none; }
+.crumbs a:hover, .crumbs a:focus-visible { color: var(--pencil-red); }
+
+.prod-head {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: clamp(24px, 3.2vw, 48px);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .prod-head { grid-template-columns: 1fr; }
+}
+
+.fact-list { list-style: none; margin: 0; padding: 0; }
+.fact-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  border-top: 1px solid var(--ink-hairline);
+  padding: 12px 0;
+  font-size: 14px;
+}
+.fact-list li:last-child { border-bottom: 1px solid var(--ink-hairline); }
+.fact-list .k {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-grey-dim);
+}
+.fact-list .v { color: var(--ink-white); }
+
+/* changelog */
+.log-list { list-style: none; margin: 0; padding: 0; }
+.log-list li {
+  display: grid;
+  grid-template-columns: 90px 110px 1fr;
+  gap: 24px;
+  border-top: 1px solid var(--ink-hairline);
+  padding: 20px 0;
+}
+.log-list li:last-child { border-bottom: 1px solid var(--ink-hairline); }
+.log-list .ver {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--pencil-red);
+}
+.log-list .date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-grey-dim);
+}
+.log-list .txt { color: var(--ink-grey); font-size: 15px; line-height: 1.6; }
+@media (max-width: 700px) {
+  .log-list li { grid-template-columns: 1fr; gap: 4px; }
+}
+
+/* download block */
+.dl-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 3.2vw, 48px);
+}
+@media (max-width: 900px) {
+  .dl-grid { grid-template-columns: 1fr; }
+}
+
+.dl-files { list-style: none; margin: 0 0 24px; padding: 0; }
+.dl-files li {
+  border-top: 1px solid var(--ink-hairline);
+  padding: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.dl-files li:last-child { border-bottom: 1px solid var(--ink-hairline); }
+.dl-files a {
+  color: var(--ink-white);
+  text-decoration: none;
+  border-bottom: 1px solid var(--pencil-red);
+}
+.dl-files a:hover, .dl-files a:focus-visible { color: var(--pencil-red); }
+.dl-files .size { color: var(--ink-grey-dim); }
+
+.sha {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-grey-dim);
+  word-break: break-all;
+  line-height: 1.7;
+}
+
+/* legal document pages */
+.legal { padding-top: 56px; }
+.legal .crumbs { margin-bottom: 24px; }
+.legal-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--ink-grey-dim);
+  margin: -24px 0 32px;
+}
+.legal-lead {
+  color: var(--ink-white);
+  font-size: clamp(16px, 1.6vw, 20px);
+  line-height: 1.6;
+  margin: 0 0 48px;
+}
+.legal-sec {
+  border-top: 1px solid var(--ink-hairline);
+  padding: 28px 0 8px;
+}
+.legal-sec h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(22px, 2.2vw, 30px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-white);
+  margin: 0 0 16px;
+}
+.legal-sec p {
+  color: var(--ink-grey);
+  line-height: 1.65;
+  font-size: 15.5px;
+  margin: 0 0 16px;
+}
+.legal-sec ul { margin: 0 0 16px; padding-left: 20px; }
+.legal-sec li { color: var(--ink-grey); line-height: 1.65; font-size: 15.5px; margin-bottom: 8px; }
+.legal-contact {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-grey-dim);
+  margin-top: 40px;
+}
+.legal-links a {
+  color: var(--ink-white);
+  text-decoration: none;
+  border-bottom: 1px solid var(--pencil-red);
+  padding-bottom: 2px;
+}
+.legal-links a:hover, .legal-links a:focus-visible { color: var(--pencil-red); }

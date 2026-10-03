@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1
+
+# The API service (user decision 1): a separate container behind nginx that
+# speaks SMTP for the waitlist and later grows into the control panel.
+# The context is the monorepo root; only the server and the shared waitlist
+# package it runs on enter the image.
+FROM oven/bun:1-debian
+WORKDIR /app
+
+# Runtime dependencies only; the lockfile pins every version. Every workspace
+# manifest is needed: --frozen-lockfile checks the whole workspace.
+COPY package.json bun.lock ./
+COPY apps/openportalhub/package.json apps/openportalhub/
+COPY apps/eventimeline/package.json apps/eventimeline/
+COPY packages/widget/package.json packages/widget/
+COPY packages/waitlist/package.json packages/waitlist/
+COPY packages/design/package.json packages/design/
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun install --frozen-lockfile --production
+
+# Only the server code and the waitlist package enter the image. .env is never
+# copied: it is git-ignored, passed by docker-compose (env_file) and read at
+# runtime.
+COPY apps/openportalhub/server ./apps/openportalhub/server
+COPY packages/waitlist ./packages/waitlist
+
+EXPOSE 8787
+
+# The image ships no curl or wget, so bun itself performs the healthcheck.
+# Promise form: no top-level await inside bun -e. The port is fixed at 8787.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD bun -e "fetch('http://127.0.0.1:8787/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+
+USER bun
+CMD ["bun", "apps/openportalhub/server/index.ts"]

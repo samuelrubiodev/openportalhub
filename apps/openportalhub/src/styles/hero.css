@@ -1,0 +1,10 @@
+/* EventTimeline — seismograph-station world. Region boxes are the scaffold's custom
+   properties, % of the frame, so they scale with it. */
+
+/* The faces that fill --font-display, --font-body, --font-mono and --font-button come
+   with this file, which is why every entry that wants the design tokens gets the
+   webfonts too. */
+
+@import './fonts.css';
+
+.logbook-lang { color: var(--ink-grey-dim); white-space: nowrap; }

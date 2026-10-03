@@ -1,0 +1,7 @@
+.logbook-badge {
+  border: 1px solid var(--ink-hairline);
+  padding: 3px 8px;
+  color: var(--ink-grey);
+}
+
+.logbook-lang { color: var(--ink-grey-dim); }

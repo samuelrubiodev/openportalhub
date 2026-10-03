@@ -1,0 +1,23 @@
+{
+  "name": "@openportalhub/waitlist",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    ".": "./src/server/index.ts",
+    "./client": "./src/client.ts",
+    "./react": "./src/react.tsx"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "dependencies": {
+    "nodemailer": "^10.0.11"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.2",
+    "@types/nodemailer": "^8.0.2",
+    "@types/react": "^19.1.0",
+    "react": "^19.1.0"
+  }
+}

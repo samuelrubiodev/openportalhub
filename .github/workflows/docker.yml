@@ -1,0 +1,106 @@
+name: docker
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# One workflow, three published images: the openportalhub web site, its
+# waitlist API and the eventimeline site. The build context is the monorepo
+# root and each leg builds its own Dockerfile from apps/, because the shared
+# packages/ workspaces live outside every app directory.
+#
+# Image names are explicit and built from github.repository_owner, so every
+# image keeps its own name (github.repository would inject the repository name
+# into every image).
+#
+# Each leg keeps its own GHA cache scope so the three builds do not thrash a
+# shared one. amd64 only: the ubuntu-latest runner is native amd64, so no
+# QEMU/binfmt is needed.
+
+jobs:
+  # The three Dockerfiles list every workspace manifest before installing, so a
+  # new package under packages/ must be added to all three. Without this guard
+  # the failure surfaces later, as a cryptic bun error about a workspace that is
+  # "listed in bun.lock but not on disk".
+  guard:
+    name: guard (workspace manifests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every Dockerfile lists every workspace manifest
+        run: |
+          status=0
+          for manifest in apps/*/package.json packages/*/package.json; do
+            for file in apps/openportalhub/Dockerfile apps/openportalhub/Dockerfile.api apps/eventimeline/Dockerfile; do
+              if ! grep -qF "$manifest" "$file"; then
+                echo "::error file=$file::$manifest is a workspace but $file never copies it; the image install will fail"
+                status=1
+              fi
+            done
+          done
+          if [ "$status" -eq 0 ]; then echo "all manifests listed"; fi
+          exit $status
+
+  build:
+    name: build (${{ matrix.image }})
+    runs-on: ubuntu-latest
+    needs: guard
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: web-openportalhub
+            file: apps/openportalhub/Dockerfile
+          - image: web-openportalhub-api
+            file: apps/openportalhub/Dockerfile.api
+          - image: web-eventimeline
+            file: apps/eventimeline/Dockerfile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
+          tags: |
+            type=ref,event=pr
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
+
+      - name: Build image (amd64 only)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.file }}
+          platforms: linux/amd64
+          # Pull requests build without pushing, and without loading the images
+          # into the daemon: the build still runs and its errors still surface,
+          # and loading three images would slow every pull request.
+          push: ${{ github.event_name != 'pull_request' }}
+          load: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}

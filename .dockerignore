@@ -1,0 +1,27 @@
+# Build output and dependencies: regenerated inside the image, never needed
+# from the context. The ** forms are the root-context equivalent of the old
+# app-level ignores: a bare name in .dockerignore only matches the context
+# root, and every workspace has its own node_modules and dist.
+**/node_modules/
+**/dist/
+**/*.tsbuildinfo
+
+# Git, CI and local tooling
+.git/
+.github/
+**/.atl/
+
+# Docs and design artifacts not used at runtime
+**/*.md
+**/skills-lock.json
+**/odd/
+
+# Logs and foreign lockfiles (these projects are bun-locked)
+**/*.log
+package-lock.json
+
+# Env files never enter the context or an image; the negation mirrors the
+# root .gitignore so the env.example template stays available.
+**/.env
+**/.env.*
+!**/.env.example

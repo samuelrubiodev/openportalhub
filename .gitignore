@@ -1,0 +1,28 @@
+# deps
+node_modules/
+
+# build output
+dist/
+
+# ts
+*.tsbuildinfo
+
+# env / secrets
+.env
+.env.*
+!.env.example
+
+# local agent runtime
+.atl/
+
+# ODD work tracking stays local (task files and playbooks are not published)
+odd/
+
+# never mix npm into these bun-locked projects
+package-lock.json
+
+# editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/

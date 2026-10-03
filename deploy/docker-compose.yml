@@ -1,0 +1,53 @@
+# One compose project for the whole portal: the two sites and the waitlist API
+# share the project's default network, so the `api` upstream name that both
+# nginx configurations proxy to (proxy_pass http://api:8787) resolves from
+# either site. The two sites occupy 8080 (openportalhub) and 8081 (eventimeline).
+#
+# Build contexts are the repository root (..): the shared packages/ workspaces
+# live outside each app directory, so an app directory cannot be the context.
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: apps/openportalhub/Dockerfile.api
+    image: ghcr.io/samuelrubiodev/web-openportalhub-api:${OPH_IMAGE_TAG:-latest}
+    container_name: openportalhub-api
+    # The real .env stays on the server (never committed): it carries the SMTP
+    # credential and the token secret. Copy env.example (in this directory) to
+    # .env next to this file and fill in the real values.
+    env_file: .env
+    # No published port: only nginx reaches the API over the compose network.
+    # nginx resolves the client address and sends it as X-Real-IP; the API
+    # trusts that header alone for rate limiting (see nginx.conf).
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://127.0.0.1:8787/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  web-openportalhub:
+    build:
+      context: ..
+      dockerfile: apps/openportalhub/Dockerfile
+    image: ghcr.io/samuelrubiodev/web-openportalhub:${OPH_IMAGE_TAG:-latest}
+    container_name: openportalhub-web
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  web-eventimeline:
+    build:
+      context: ..
+      dockerfile: apps/eventimeline/Dockerfile
+    image: ghcr.io/samuelrubiodev/web-eventimeline:${OPH_IMAGE_TAG:-latest}
+    container_name: eventtimeline-web
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+    depends_on:
+      - api
